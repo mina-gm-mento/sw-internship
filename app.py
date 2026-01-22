@@ -27,20 +27,27 @@ def check_todo(i, new_value):
 def remove_todo(i):
     state.todos.pop(i)
 
+def delete_all_checked():
+    state.todos = [t for t in state.todos if not t.is_done]
+
 st.title("To-do list")
 
 st.text_input("New item", key="new_item_text", placeholder="Add to-do item")
 st.button("Add", on_click=add_todo)
 
-for i, todo in enumerate(state.todos):
-    c1, c2 = st.columns([0.9, 0.1])
-    with c1:
-        # ✅ 토글 값을 직접 넘기지 말고 현재 체크 상태를 기준으로 콜백에서 처리
-        st.checkbox(
-            label=todo.text,
-            value=todo.is_done,
-            key=f"chk-{todo.uid}",
-            on_change=lambda idx=i: check_todo(idx, not state.todos[idx].is_done),
-        )
-    with c2:
-        st.button("🗑️", key=f"del-{todo.uid}", on_click=lambda idx=i: remove_todo(idx))
+if state.todos:
+    for i, todo in enumerate(state.todos):
+        c1, c2 = st.columns([0.9, 0.1])
+        with c1:
+            st.checkbox(
+                label=todo.text,
+                value=todo.is_done,
+                key=f"chk-{todo.uid}",
+                on_change=lambda idx=i: check_todo(idx, not state.todos[idx].is_done),
+            )
+        with c2:
+            st.button("🗑️", key=f"del-{todo.uid}", on_click=lambda idx=i: remove_todo(idx))
+
+    st.button("Delete all checked", on_click=delete_all_checked)
+else:
+    st.info("오늘 할일 끝!! 행복한 주말 보내세요! 😄")
