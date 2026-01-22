@@ -1,12 +1,28 @@
+
 import streamlit as st
+from dataclasses import dataclass, field
+import uuid
 
-st.title("🚗 GM SW Intern Streamlit Demo")
+st.set_page_config(page_title="To-do list", page_icon=":memo:")
 
-st.write("안녕하세요! Streamlit으로 만든 첫 번째 앱입니다.")
+state = st.session_state
 
-name = st.text_input("이름을 입력하세요")
+@dataclass
+class Todo:
+    text: str
+    is_done: bool = False
+    uid: uuid.UUID = field(default_factory=uuid.uuid4)
 
-if name:
-    st.success(f"{name}님, 반갑습니다! 🎉")
+# 초기 목록 한 번만 세팅
+if "todos" not in state:
+    state.todos = [
+        Todo(text="출근"),
+        Todo(text="SW 교육"),
+        Todo(text="회식"),
+    ]
 
-st.button("버튼")
+st.title("To-do list")
+
+# 목록 표시만 (아직 입력/버튼 없음)
+for todo in state.todos:
+    st.write(f"• {todo.text}")
