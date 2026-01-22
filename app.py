@@ -19,12 +19,28 @@ def add_todo():
     text = state.get("new_item_text", "").strip()
     if text:
         state.todos.append(Todo(text=text))
-    state.new_item_text = ""  # ✅ 콜백 안에서 리셋
+    state.new_item_text = ""
+
+def check_todo(i, new_value):
+    state.todos[i].is_done = new_value
+
+def remove_todo(i):
+    state.todos.pop(i)
 
 st.title("To-do list")
 
 st.text_input("New item", key="new_item_text", placeholder="Add to-do item")
-st.button("Add", on_click=add_todo)  # ✅ 안전
+st.button("Add", on_click=add_todo)
 
-for todo in state.todos:
-    st.write(f"- {todo.text}")
+for i, todo in enumerate(state.todos):
+    c1, c2 = st.columns([0.9, 0.1])
+    with c1:
+        # ✅ 토글 값을 직접 넘기지 말고 현재 체크 상태를 기준으로 콜백에서 처리
+        st.checkbox(
+            label=todo.text,
+            value=todo.is_done,
+            key=f"chk-{todo.uid}",
+            on_change=lambda idx=i: check_todo(idx, not state.todos[idx].is_done),
+        )
+    with c2:
+        st.button("🗑️", key=f"del-{todo.uid}", on_click=lambda idx=i: remove_todo(idx))
